@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.calculator {
+    background-color: #2d2d2d;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 400px;
+    width: 100%;
+}
+
+.display {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 3rem;
+    font-family: 'Courier New', monospace;
+    text-align: right;
+    padding: 30px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.button {
+    background-color: #2e2e2e;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.5rem;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.button:hover {
+    filter: brightness(1.2);
+}
+
+.button:active {
+    transform: scale(0.95);
+    filter: brightness(1.4);
+}
+
+.button.number {
+    background-color: #2e2e2e;
+}
+
+.button.operator {
+    background-color: #ff9500;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.button.clear {
+    background-color: #505050;
+    font-weight: 600;
+}
+
+.button.equals {
+    background-color: #ff9500;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.button.decimal {
+    background-color: #2e2e2e;
+}
+
+.button.zero {
+    grid-column: span 1;
+}
+
+.button.span-row {
+    background-color: transparent;
+    cursor: default;
+    pointer-events: none;
+}
+
+@media (max-width: 767px) {
+    .calculator {
+        max-width: 100%;
+    }
+
+    .display {
+        font-size: 2.5rem;
+        padding: 25px 15px;
+        min-height: 80px;
+    }
+
+    .button {
+        font-size: 1.3rem;
+        padding: 20px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .calculator {
+        max-width: 380px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .calculator {
+        max-width: 400px;
+    }
+}
