@@ -12,6 +12,28 @@ A simple, elegant web-based calculator with a dark mode interface built with pur
 - **Responsive Design**: Works on desktop, tablet, and mobile devices
 - **No Dependencies**: Pure vanilla JavaScript - no frameworks required
 
+## Architecture
+
+The calculator follows a simple three-layer architecture with clear separation of concerns:
+
+```mermaid
+graph TD
+    User([User]) -->|Clicks buttons| HTML[HTML Structure<br/>index.html]
+    HTML -->|DOM Events| JS[JavaScript Logic<br/>calculator.js]
+    JS -->|Updates display| HTML
+    CSS[CSS Styles<br/>styles.css] -.->|Styles| HTML
+
+    style HTML fill:#9370DB
+    style CSS fill:#9370DB
+    style JS fill:#9370DB
+    style User fill:#87CEEB
+```
+
+**Component Roles**:
+- **HTML**: Defines the calculator structure and layout
+- **CSS**: Provides dark mode styling using CSS Grid
+- **JavaScript**: Handles all calculation logic and state management
+
 ## Usage
 
 ### Getting Started
@@ -40,6 +62,55 @@ A simple, elegant web-based calculator with a dark mode interface built with pur
 - Press "=" multiple times to repeat the last operation
 - Example: `10 - 2 [=]` → `8`, press `[=]` again → `6` (subtracts 2 again)
 
+### User Interaction Flow
+
+The following flowchart illustrates how user interactions are processed:
+
+```mermaid
+flowchart TD
+    Start([User Opens Calculator]) --> Display[Display shows '0']
+    Display --> Input{User Input Type?}
+
+    Input -->|Number| CheckWaiting{Waiting for<br/>second operand?}
+    CheckWaiting -->|Yes| NewNumber[Start new number]
+    CheckWaiting -->|No| AppendNumber[Append to display]
+    NewNumber --> UpdateDisplay[Update Display]
+    AppendNumber --> UpdateDisplay
+
+    Input -->|Decimal| CheckDecimal{Display has<br/>decimal?}
+    CheckDecimal -->|No| AddDecimal[Add decimal point]
+    CheckDecimal -->|Yes| Ignore[Ignore input]
+    AddDecimal --> UpdateDisplay
+    Ignore --> Input
+
+    Input -->|Operator| CheckFirst{First operand<br/>exists?}
+    CheckFirst -->|No| StoreFirst[Store as first operand]
+    CheckFirst -->|Yes| Calculate1[Calculate intermediate result]
+    Calculate1 --> ShowResult1[Display result]
+    ShowResult1 --> StoreFirst
+    StoreFirst --> WaitSecond[Wait for second operand]
+    WaitSecond --> Input
+
+    Input -->|Equals| CheckOperator{Has operator?}
+    CheckOperator -->|Yes| Calculate2[Perform calculation]
+    CheckOperator -->|No| Input
+    Calculate2 --> CheckZero{Division<br/>by zero?}
+    CheckZero -->|Yes| ShowError[Display 'Error']
+    CheckZero -->|No| ShowResult2[Display result]
+    ShowError --> Input
+    ShowResult2 --> Input
+
+    Input -->|Clear| Reset[Reset all state]
+    Reset --> Display
+
+    style Start fill:#87CEEB
+    style Display fill:#90EE90
+    style ShowError fill:#FFB6C6
+    style ShowResult1 fill:#90EE90
+    style ShowResult2 fill:#90EE90
+    style UpdateDisplay fill:#90EE90
+```
+
 ## Browser Compatibility
 
 This calculator works in all modern browsers:
@@ -50,18 +121,63 @@ This calculator works in all modern browsers:
 
 ## File Structure
 
+The project consists of four main files with clear dependencies:
+
+```mermaid
+graph LR
+    HTML[index.html<br/>Structure] -->|link| CSS[styles.css<br/>Dark Mode Styles]
+    HTML -->|script| JS[calculator.js<br/>Calculator Logic]
+    JS -->|DOM query| Display[Display Element]
+    JS -->|Event delegation| Buttons[Button Container]
+    HTML -.->|contains| Display
+    HTML -.->|contains| Buttons
+
+    style HTML fill:#9370DB
+    style CSS fill:#9370DB
+    style JS fill:#9370DB
+    style Display fill:#FFE4B5
+    style Buttons fill:#FFE4B5
 ```
-calculator/
-├── index.html          # Main HTML structure
-├── styles.css          # Dark mode styling and layout
-├── calculator.js       # Calculator logic and state management
-└── README.md          # This file
-```
+
+**File Descriptions**:
+- `index.html` - Main HTML structure with calculator layout
+- `styles.css` - Dark mode styling and responsive grid layout
+- `calculator.js` - Calculator logic and state management
+- `README.md` - This documentation file
 
 ## Implementation Details
 
 ### State Management
-The calculator maintains the following state:
+
+The calculator maintains the following state variables:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Initial: Load
+
+    Initial --> EnteringNumber: Number clicked
+    EnteringNumber --> WaitingForSecond: Operator clicked
+
+    WaitingForSecond --> EnteringSecond: Number clicked
+    EnteringSecond --> DisplayingResult: Equals clicked
+    EnteringSecond --> WaitingForSecond: Operator clicked
+
+    DisplayingResult --> EnteringNumber: Number clicked
+    DisplayingResult --> WaitingForSecond: Operator clicked
+
+    EnteringNumber --> Initial: Clear clicked
+    WaitingForSecond --> Initial: Clear clicked
+    EnteringSecond --> Initial: Clear clicked
+    DisplayingResult --> Initial: Clear clicked
+
+    note right of Initial
+        currentDisplay = "0"
+        firstOperand = null
+        operator = null
+    end note
+```
+
+**State Variables**:
 - `currentDisplay`: Current number shown on screen
 - `firstOperand`: First number in a calculation
 - `operator`: Selected operator (+, -, ×, ÷)

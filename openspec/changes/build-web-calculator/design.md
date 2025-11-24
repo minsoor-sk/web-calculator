@@ -10,6 +10,25 @@ calculator/
 └── calculator.js       # Application logic and state management
 ```
 
+### Component Architecture Diagram
+
+The following diagram illustrates the component relationships and data flow:
+
+```mermaid
+graph TD
+    User([User]) -->|Clicks buttons| HTML[HTML Structure<br/>index.html]
+    HTML -->|DOM Events| JS[JavaScript Logic<br/>calculator.js]
+    JS -->|Updates display| HTML
+    CSS[CSS Styles<br/>styles.css] -.->|Styles| HTML
+    JS -->|State Management| State[(State:<br/>currentDisplay<br/>firstOperand<br/>operator<br/>waitingForSecondOperand)]
+
+    style HTML fill:#9370DB
+    style CSS fill:#9370DB
+    style JS fill:#9370DB
+    style State fill:#90EE90
+    style User fill:#87CEEB
+```
+
 ### Component Breakdown
 1. **HTML (Structure)**: Semantic markup defining the calculator layout
 2. **CSS (Presentation)**: Dark mode styling with CSS Grid for button layout
@@ -22,13 +41,54 @@ The calculator maintains the following state in JavaScript:
 - `operator`: String storing the selected operator (+, -, ×, ÷)
 - `waitingForSecondOperand`: Boolean flag indicating input state
 
-### State Transitions
-```
-[Initial] → User clicks number → Update currentDisplay
-         → User clicks operator → Store firstOperand + operator, set waitingForSecondOperand
-         → User clicks number → Start new currentDisplay (secondOperand)
-         → User clicks equals → Calculate result, update display, reset state
-         → User clicks clear → Reset all state
+### State Transitions Diagram
+
+The following state diagram shows how the calculator transitions between different operational states:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Initial: Load Calculator
+
+    Initial --> EnteringNumber: Click number
+    EnteringNumber --> EnteringNumber: Click number/decimal
+    EnteringNumber --> WaitingForSecond: Click operator
+
+    WaitingForSecond --> EnteringSecond: Click number
+    EnteringSecond --> EnteringSecond: Click number/decimal
+    EnteringSecond --> DisplayingResult: Click equals
+    EnteringSecond --> WaitingForSecond: Click operator (chain)
+
+    DisplayingResult --> EnteringNumber: Click number (new calc)
+    DisplayingResult --> WaitingForSecond: Click operator (continue)
+    DisplayingResult --> DisplayingResult: Click equals (repeat)
+
+    WaitingForSecond --> ErrorState: Division by zero
+    EnteringSecond --> ErrorState: Division by zero
+
+    ErrorState --> Initial: Click any number/clear
+
+    EnteringNumber --> Initial: Click clear
+    WaitingForSecond --> Initial: Click clear
+    EnteringSecond --> Initial: Click clear
+    DisplayingResult --> Initial: Click clear
+
+    note right of Initial
+        currentDisplay = "0"
+        firstOperand = null
+        operator = null
+        waitingForSecondOperand = false
+    end note
+
+    note right of WaitingForSecond
+        firstOperand stored
+        operator stored
+        waitingForSecondOperand = true
+    end note
+
+    note right of ErrorState
+        currentDisplay = "Error"
+        All state reset on next input
+    end note
 ```
 
 ## User Interface Design
